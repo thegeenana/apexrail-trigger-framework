@@ -1,0 +1,16 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "ApexRail",
+      "versionName": "Foundation",
+      "versionNumber": "0.1.0.NEXT"
+    }
+  ],
+  "name": "ApexRail Trigger Framework",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "66.0",
+  "packageAliases": {}
+}
