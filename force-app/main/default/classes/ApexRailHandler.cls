@@ -20,18 +20,11 @@ public abstract inherited sharing class ApexRailHandler {
         }
 
         if (isAfterOperation()) {
-            runAfterOnce(handlerName);
+            dispatchAfter();
             return;
         }
 
-        dispatch();
-    }
-
-    private void runAfterOnce(String handlerName) {
-        String executionKey = handlerName + ':' + String.valueOf(context.operation);
-        if (ApexRailGuard.enterOnce(executionKey)) {
-            dispatch();
-        }
+        dispatchBefore();
     }
 
     private Boolean isAfterOperation() {
@@ -41,16 +34,23 @@ public abstract inherited sharing class ApexRailHandler {
             context.operation == System.TriggerOperation.AFTER_UNDELETE;
     }
 
-    private void dispatch() {
+    private void dispatchBefore() {
         switch on context.operation {
             when BEFORE_INSERT { beforeInsert(); }
             when BEFORE_UPDATE { beforeUpdate(); }
             when BEFORE_DELETE { beforeDelete(); }
+        }
+    }
+
+    private void dispatchAfter() {
+        switch on context.operation {
             when AFTER_INSERT { afterInsert(); }
             when AFTER_UPDATE { afterUpdate(); }
             when AFTER_DELETE { afterDelete(); }
             when AFTER_UNDELETE { afterUndelete(); }
         }
+
+        runAfter();
     }
 
     protected virtual void beforeInsert() {}
@@ -60,6 +60,7 @@ public abstract inherited sharing class ApexRailHandler {
     protected virtual void afterUpdate() {}
     protected virtual void afterDelete() {}
     protected virtual void afterUndelete() {}
+    protected abstract void runAfter();
 
     protected virtual String getHandlerName() {
         return String.valueOf(this).substringBefore(':');

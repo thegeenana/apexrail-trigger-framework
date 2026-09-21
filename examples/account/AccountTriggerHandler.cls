@@ -13,4 +13,8 @@ public inherited sharing class AccountTriggerHandler extends ApexRailHandler {
             context
         );
     }
+
+    protected override void runAfter() {
+        // This example declares only before contexts, so there is no work to flush.
+    }
 }

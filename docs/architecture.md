@@ -15,6 +15,8 @@ flowchart TD
     P --> A2["Action 2"]
     A1 --> D["Domain services"]
     A2 --> D
+    H --> B["ApexRailAfterBuffer"]
+    B --> F["runAfter flush"]
 ```
 
 ### Dispatcher
@@ -27,20 +29,19 @@ flowchart TD
 
 ### Handler
 
-An object handler maps lifecycle phases to an ordered pipeline. It coordinates; it does not become a home for all domain logic. `run()` dispatches before operations every time and routes after operations through `runAfterOnce`.
+An object handler maps lifecycle phases to an ordered pipeline. It coordinates; it does not become a home for all domain logic. For an after context, `run()` invokes the matching lifecycle method and then calls the abstract `runAfter()` once for that invocation. Requiring an implementation forces each handler to declare how it flushes—or intentionally does not flush—after work.
 
 ### Pipeline and actions
 
 An action has one method and one reason to change. Source order is execution order. Dynamic metadata-driven class registration is intentionally excluded from the foundation release because compile-time visibility is safer and easier to debug.
 
+### After buffer
+
+`ApexRailAfterBuffer` stores records by work type and deduplication key. Registering the same key replaces the previous value, allowing the final record representation to win. An implementation of `runAfter()` drains a work type and performs the consolidated DML or durable hand-off.
+
 ### Guard
 
-`ApexRailGuard` provides two transaction-local controls:
-
-- an execution-key guard used by `runAfterOnce`;
-- processed record IDs for named actions requiring finer-grained idempotency.
-
-The after execution key is `handler name + trigger operation`. Therefore `after insert` and `after update` are independent, while a repeated `after update` invocation is suppressed.
+`ApexRailGuard` remembers processed record IDs per named action for the current transaction. It remains available for application actions that require record-level idempotency; it does not suppress the complete after lifecycle.
 
 ### Control
 

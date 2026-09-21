@@ -4,6 +4,7 @@ private class ApexRailHandlerTest {
         private static Integer beforeUpdateCalls = 0;
         private static Integer afterInsertCalls = 0;
         private static Integer afterUpdateCalls = 0;
+        private static Integer runAfterCalls = 0;
 
         RecordingHandler(ApexRailContext context) {
             super(context);
@@ -19,6 +20,10 @@ private class ApexRailHandlerTest {
 
         protected override void afterUpdate() {
             afterUpdateCalls++;
+        }
+
+        protected override void runAfter() {
+            runAfterCalls++;
         }
 
         protected override String getHandlerName() {
@@ -38,14 +43,15 @@ private class ApexRailHandlerTest {
     }
 
     @IsTest
-    static void sameAfterOperationRunsOncePerTransaction() {
+    static void afterOperationAndFinaliserRunForEachInvocation() {
         resetState();
         ApexRailContext context = contextFor(System.TriggerOperation.AFTER_UPDATE);
 
         new RecordingHandler(context).run();
         new RecordingHandler(context).run();
 
-        Assert.areEqual(1, RecordingHandler.afterUpdateCalls);
+        Assert.areEqual(2, RecordingHandler.afterUpdateCalls);
+        Assert.areEqual(2, RecordingHandler.runAfterCalls);
     }
 
     @IsTest
@@ -61,6 +67,7 @@ private class ApexRailHandlerTest {
 
         Assert.areEqual(1, RecordingHandler.afterInsertCalls);
         Assert.areEqual(1, RecordingHandler.afterUpdateCalls);
+        Assert.areEqual(2, RecordingHandler.runAfterCalls);
     }
 
     private static ApexRailContext contextFor(
@@ -75,5 +82,6 @@ private class ApexRailHandlerTest {
         RecordingHandler.beforeUpdateCalls = 0;
         RecordingHandler.afterInsertCalls = 0;
         RecordingHandler.afterUpdateCalls = 0;
+        RecordingHandler.runAfterCalls = 0;
     }
 }

@@ -34,16 +34,6 @@ private class ApexRailGuardTest {
         }
     }
 
-    @IsTest
-    static void executionKeyCanOnlyBeEnteredOnce() {
-        ApexRailGuard.reset();
-
-        Assert.isTrue(ApexRailGuard.enterOnce('AccountHandler:AFTER_UPDATE'));
-        Assert.isFalse(ApexRailGuard.enterOnce('AccountHandler:AFTER_UPDATE'));
-        Assert.isTrue(ApexRailGuard.enterOnce('AccountHandler:AFTER_INSERT'));
-        Assert.isTrue(ApexRailGuard.enterOnce('ContactHandler:AFTER_UPDATE'));
-    }
-
     private class TestUtility {
         static Id idFor(Schema.SObjectType objectType, Integer numberValue) {
             String prefix = objectType.getDescribe().getKeyPrefix();

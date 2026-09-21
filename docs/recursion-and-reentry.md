@@ -12,14 +12,14 @@ ApexRail distinguishes before and after behaviour:
 | Context | Policy |
 |---|---|
 | Before insert/update/delete | Run on every invocation |
-| After insert | Once per handler per transaction |
-| After update | Once per handler per transaction |
-| After delete | Once per handler per transaction |
-| After undelete | Once per handler per transaction |
+| After insert | Collect, then call `runAfter()` once for this invocation |
+| After update | Collect, then call `runAfter()` once for this invocation |
+| After delete | Collect, then call `runAfter()` once for this invocation |
+| After undelete | Collect, then call `runAfter()` once for this invocation |
 
-`ApexRailHandler.run()` routes after contexts through `runAfterOnce`. The execution key includes both handler name and trigger operation. An `after insert` followed by an `after update` can therefore execute both lifecycle methods, while the same `after update` cannot run twice.
+`ApexRailHandler.run()` dispatches the context-specific method and invokes `runAfter()` immediately afterwards. The context method should collect or merge work; `runAfter()` should flush it in bulk.
 
-This protects side effects such as creating related records, publishing events or registering asynchronous work.
+If Flow, workflow or Apex causes trigger re-entry, another invocation occurs and another collect-and-flush cycle is allowed. Suppressing that invocation could discard newly discovered work.
 
 ## Why not one global Boolean?
 
@@ -27,7 +27,28 @@ This protects side effects such as creating related records, publishing events o
 if (TriggerState.hasRun) return;
 ```
 
-This disables every context indiscriminately. It can suppress an `after update` merely because `after insert` ran first, and it does not state which handler was executed. ApexRail instead scopes the run-once key to handler and after operation.
+This disables every context indiscriminately and can discard records introduced by later automation. ApexRail does not use a global Boolean to suppress its after lifecycle.
+
+## Collect and flush
+
+```apex
+protected override void afterUpdate() {
+    ApexRailAfterBuffer.register(
+        'MapatoOnboarding',
+        opportunity.Id,
+        request
+    );
+}
+
+protected override void runAfter() {
+    List<SObject> records = ApexRailAfterBuffer.drain('MapatoOnboarding');
+    if (!records.isEmpty()) {
+        Database.insert(records, false);
+    }
+}
+```
+
+The map gives one latest record per deduplication key and the flush gives one bulk DML statement for that invocation.
 
 ## Per-action and per-record guard
 
@@ -44,4 +65,4 @@ This second guard is available when an application needs more precise protection
 
 Before-insert records do not yet have IDs. Do not invent a universal workaround. An application can use a stable business key, a narrowly scoped pass counter, or design the action to be naturally idempotent.
 
-Static state is transaction-local. Each Bulk API chunk or asynchronous job normally runs in another transaction and receives fresh static state. Durable integration idempotency therefore requires persisted keys and downstream enforcement.
+There is no ordinary synchronous trigger callback meaning “all trigger re-entry has finished.” A true once-after-commit final step must persist intent and use Queueable Apex, Platform Events or another asynchronous mechanism. Static state is transaction-local; each later transaction receives fresh state.

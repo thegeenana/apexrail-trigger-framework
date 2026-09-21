@@ -5,3 +5,4 @@
 - [ADR-0003: Action-and-record re-entry guard](0003-action-record-reentry-guard.md)
 - [ADR-0004: Integration outside the framework core](0004-integration-boundary.md)
 - [ADR-0005: Before always, after once](0005-before-always-after-once.md)
+- [ADR-0006: Collect, flush and finalise](0006-collect-flush-finalise.md)

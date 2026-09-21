@@ -2,6 +2,8 @@
 
 The trigger constructs an object handler and passes it to `ApexRail.dispatch`. The handler obtains an immutable reference to the current trigger context and invokes exactly one lifecycle hook.
 
+After the relevant after-context hook completes, the handler invokes `runAfter()` once. This is a pipeline finaliser for the current invocation, not a Salesforce Queueable Transaction Finalizer and not an end-of-transaction callback.
+
 | Operation | Typical responsibility |
 |---|---|
 | Before insert | Defaults, normalisation, validation |

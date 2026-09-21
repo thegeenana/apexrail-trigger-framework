@@ -5,8 +5,10 @@
 - dispatch rejects invalid input;
 - lifecycle routing invokes the correct hook;
 - before hooks run on repeated invocation;
-- the same after hook runs once per transaction;
-- distinct after operations can each run once;
+- an after hook and `runAfter()` execute once per invocation;
+- repeated trigger invocation is not silently suppressed;
+- the after buffer deduplicates by work type and key;
+- draining one work type does not drain another;
 - pipelines preserve declared order;
 - null actions fail clearly;
 - guards track IDs independently per action;

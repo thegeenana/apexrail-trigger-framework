@@ -1,10 +1,10 @@
 # ADR-0005: Before always, after once
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0006](0006-collect-flush-finalise.md)
 
 ## Decision
 
-ApexRail executes before-trigger lifecycle methods on every invocation. It executes each after-trigger lifecycle method once per handler and trigger operation within an Apex transaction.
+ApexRail previously proposed executing each after-trigger lifecycle method once per handler and trigger operation within a transaction.
 
 The execution key is:
 
@@ -20,8 +20,6 @@ Before logic commonly normalises and validates the current record state and may 
 
 A single unscoped Boolean was rejected because it can suppress a different lifecycle operation that has not run.
 
-## Consequences
+## Reason for supersession
 
-- Re-entered records are not passed to the same after operation a second time.
-- Applications must put essential same-transaction second-pass calculations in before logic or design an explicit alternative.
-- The guarantee ends with the transaction. Durable idempotency is still required across transactions.
+Salesforce exposes no reliable synchronous callback identifying the final trigger invocation. Running on the first invocation and suppressing later invocations can discard work discovered during Flow, workflow or Apex re-entry.
