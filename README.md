@@ -115,6 +115,10 @@ The content under `examples/` is instructional and is not part of the default pa
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes. Please report vulnerabilities according to [SECURITY.md](SECURITY.md).
 
+## Author
+
+ApexRail was created and is maintained by [George Wiafe](AUTHORS.md), Product and Solutions Architect.
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).

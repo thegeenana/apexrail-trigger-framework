@@ -20,3 +20,7 @@ Thank you for improving ApexRail.
 4. Open a pull request explaining the problem, decision and trade-offs.
 
 Public API expansion requires evidence from a concrete use case. Generality alone is not sufficient.
+
+## Recognition
+
+The project was created and is led by George Wiafe. Additional contributors are recognised through Git commit history, accepted pull requests and release notes where appropriate. See [AUTHORS.md](AUTHORS.md).
