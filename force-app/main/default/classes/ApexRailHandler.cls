@@ -5,12 +5,43 @@ public abstract inherited sharing class ApexRailHandler {
         this.context = ApexRailContext.fromTrigger();
     }
 
+    @TestVisible
+    protected ApexRailHandler(ApexRailContext context) {
+        if (context == null) {
+            throw new ApexRailException('ApexRail handler requires a context.');
+        }
+        this.context = context;
+    }
+
     public void run() {
         String handlerName = getHandlerName();
         if (ApexRailControl.isBypassed(handlerName)) {
             return;
         }
 
+        if (isAfterOperation()) {
+            runAfterOnce(handlerName);
+            return;
+        }
+
+        dispatch();
+    }
+
+    private void runAfterOnce(String handlerName) {
+        String executionKey = handlerName + ':' + String.valueOf(context.operation);
+        if (ApexRailGuard.enterOnce(executionKey)) {
+            dispatch();
+        }
+    }
+
+    private Boolean isAfterOperation() {
+        return context.operation == System.TriggerOperation.AFTER_INSERT ||
+            context.operation == System.TriggerOperation.AFTER_UPDATE ||
+            context.operation == System.TriggerOperation.AFTER_DELETE ||
+            context.operation == System.TriggerOperation.AFTER_UNDELETE;
+    }
+
+    private void dispatch() {
         switch on context.operation {
             when BEFORE_INSERT { beforeInsert(); }
             when BEFORE_UPDATE { beforeUpdate(); }

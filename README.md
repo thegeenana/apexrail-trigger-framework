@@ -12,6 +12,7 @@ Salesforce automation becomes difficult to reason about when an object accumulat
 
 - one trigger per object;
 - lifecycle dispatch through a handler;
+- before contexts run on every invocation while each after context runs once per transaction;
 - ordered, independently testable actions;
 - collection-first APIs and bulk-safe execution;
 - action-and-record re-entry control;
@@ -61,6 +62,12 @@ See [`examples/account`](examples/account) for a complete example.
 
 ApexRail governs Apex record-trigger execution. It does **not** replace Flow, provide an integration transport, or hide Salesforce transaction semantics. External delivery should be handed to Queueable Apex, Platform Events, or another durable asynchronous mechanism after recording transactional intent.
 
+## Run-once guarantee
+
+`ApexRailHandler.run()` always dispatches before-trigger contexts. For after-trigger contexts it builds a key from the handler and operation, then delegates through `runAfterOnce`. Consequently, `after insert` and `after update` can each execute once, but re-entry cannot execute the same after operation twice within one transaction.
+
+This is transaction-local control. Cross-transaction protection still requires durable idempotency.
+
 ## Documentation
 
 - [Architecture](docs/architecture.md)
@@ -94,7 +101,7 @@ The content under `examples/` is instructional and is not part of the default pa
 1. A trigger detects an event; a domain service understands the business.
 2. Execution order is visible in source control.
 3. Bulk behaviour is designed into method signatures.
-4. Re-entry is controlled narrowly, never by disabling an entire trigger indiscriminately.
+4. Before logic may re-evaluate; the same after lifecycle runs once per handler and operation.
 5. Security and database access mode are explicit application decisions.
 6. A committed business state does not prove successful external delivery.
 

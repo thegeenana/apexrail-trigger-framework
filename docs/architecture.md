@@ -27,7 +27,7 @@ flowchart TD
 
 ### Handler
 
-An object handler maps lifecycle phases to an ordered pipeline. It coordinates; it does not become a home for all domain logic.
+An object handler maps lifecycle phases to an ordered pipeline. It coordinates; it does not become a home for all domain logic. `run()` dispatches before operations every time and routes after operations through `runAfterOnce`.
 
 ### Pipeline and actions
 
@@ -35,7 +35,12 @@ An action has one method and one reason to change. Source order is execution ord
 
 ### Guard
 
-`ApexRailGuard` remembers processed record IDs per named action for the current transaction. It prevents a duplicate action without suppressing unrelated automation.
+`ApexRailGuard` provides two transaction-local controls:
+
+- an execution-key guard used by `runAfterOnce`;
+- processed record IDs for named actions requiring finer-grained idempotency.
+
+The after execution key is `handler name + trigger operation`. Therefore `after insert` and `after update` are independent, while a repeated `after update` invocation is suppressed.
 
 ### Control
 

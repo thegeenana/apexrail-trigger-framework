@@ -4,6 +4,9 @@
 
 - dispatch rejects invalid input;
 - lifecycle routing invokes the correct hook;
+- before hooks run on repeated invocation;
+- the same after hook runs once per transaction;
+- distinct after operations can each run once;
 - pipelines preserve declared order;
 - null actions fail clearly;
 - guards track IDs independently per action;

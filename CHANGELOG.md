@@ -15,3 +15,5 @@ All notable changes will be documented here.
 - Non-packaged Account example.
 - Mapato asynchronous integration reference.
 - Architecture decisions and interview guide.
+- Explicit before-always/after-once lifecycle policy keyed by handler and operation.
+- Handler tests proving repeated before execution and once-only after execution.
