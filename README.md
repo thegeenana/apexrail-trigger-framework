@@ -56,7 +56,11 @@ public inherited sharing class AccountTriggerHandler extends ApexRailHandler {
 }
 ```
 
-See [`examples/account`](examples/account) for a complete example.
+See the examples:
+
+- [`examples/account`](examples/account) — a small before-context example;
+- [`examples/opportunity`](examples/opportunity) — transition detection, buffering and `runAfter()` bulk DML;
+- [`examples/mapato`](examples/mapato) — durable asynchronous integration boundary.
 
 ## Design boundaries
 

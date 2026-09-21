@@ -18,3 +18,4 @@ All notable changes will be documented here.
 - `runAfter()` pipeline finaliser for every after-trigger invocation.
 - `ApexRailAfterBuffer` with work-type and key-based deduplication.
 - Handler and buffer tests covering collect-and-flush behaviour.
+- Opportunity reference example demonstrating transition detection, deduplication and bulk DML in `runAfter()`.

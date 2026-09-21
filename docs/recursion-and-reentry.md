@@ -50,6 +50,8 @@ protected override void runAfter() {
 
 The map gives one latest record per deduplication key and the flush gives one bulk DML statement for that invocation.
 
+See the complete [Opportunity example](../examples/opportunity), which collects follow-up Tasks for Opportunities entering `Closed Won` and inserts the batch inside `runAfter()`.
+
 ## Per-action and per-record guard
 
 ```apex
